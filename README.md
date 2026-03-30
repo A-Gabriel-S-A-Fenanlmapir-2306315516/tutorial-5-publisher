@@ -69,7 +69,7 @@ You can install Postman via this website: https://www.postman.com/downloads/
     -   [x] Commit: `Implement notify function in Notification service to notify each Subscriber.`
     -   [x] Commit: `Implement publish function in Program service and Program controller.`
     -   [x] Commit: `Edit Product service methods to call notify after create/delete.`
-    -   [ ] Write answers of your learning module's "Reflection Publisher-3" questions in this README.
+    -   [x] Write answers of your learning module's "Reflection Publisher-3" questions in this README.
 
 ## Your Reflections
 This is the place for you to write reflections:
@@ -122,3 +122,19 @@ This is the place for you to write reflections:
     > * **Documentation:** Postman bisa menggenerasi dokumentasi API secara otomatis sehingga anggota tim lain (seperti bagian Frontend) tahu cara menggunakan API yang kita buat tanpa harus membaca seluruh kode Rust kita.
 
 #### Reflection Publisher-3
+
+1. **Observer Pattern has two variations: Push model (publisher pushes data to subscribers) and Pull model (subscribers pull data from publisher). In this tutorial case, which variation of Observer Pattern that we use?**
+
+    > Dalam tutorial ini, kita menggunakan **Push model**. Hal ini terlihat dari implementasi di mana pihak Publisher (BambangShop) yang secara proaktif mengirimkan data notifikasi kepada para subscriber segera setelah terjadi perubahan status pada produk (Created, Deleted, atau Promotion). Publisher memanggil metode `update` milik subscriber dan menyertakan objek `Notification` sebagai *payload* datanya.
+
+2. **What are the advantages and disadvantages of using the other variation of Observer Pattern for this tutorial case? (example: if you answer Q1 with Push, then imagine if we used Pull)**
+
+    > Jika kita menggunakan **Pull model**, maka keadaannya akan terbalik: Subscriber yang harus terus-menerus mengecek (polling) ke Publisher apakah ada update terbaru.
+    > * **Keuntungan Pull model:** Subscriber memiliki kendali penuh atas kapan mereka ingin mengambil data. Jika subscriber sedang sibuk, mereka tidak akan "dibombardir" oleh kiriman data dari publisher. Publisher juga tidak perlu tahu detail struktur data yang dibutuhkan subscriber secara spesifik.
+    > * **Kekurangan Pull model:** Sangat tidak efisien dalam penggunaan jaringan dan sumber daya (CPU). Subscriber mungkin akan melakukan banyak *request* yang sia-sia jika ternyata belum ada update. Selain itu, ada jeda waktu (latency) antara saat data berubah di Publisher hingga saat Subscriber menarik data tersebut.
+
+3. **Explain what will happen to the program if we decide to not use multi-threading in the notification process.**
+
+    > Jika kita tidak menggunakan *multi-threading* (seperti `thread::spawn` yang kita implementasikan), maka proses pengiriman notifikasi akan bersifat **Blocking** dan **Sequential**. 
+    > 
+    > Program akan mengirim notifikasi ke subscriber pertama, menunggu sampai respon HTTP selesai, baru kemudian lanjut ke subscriber kedua, dan seterusnya. Jika salah satu subscriber memiliki koneksi internet yang lambat atau servernya sedang *down*, seluruh proses di Publisher akan "macet" (hang). Pengguna yang sedang membuat produk mungkin harus menunggu waktu yang sangat lama hanya untuk mendapatkan respon "Success" karena sistem sibuk mengirimkan notifikasi satu per satu ke banyak pelanggan. Dengan *multi-threading*, Publisher bisa langsung memberikan respon ke pengguna sementara proses pengiriman notifikasi berjalan di latar belakang secara bersamaan.
