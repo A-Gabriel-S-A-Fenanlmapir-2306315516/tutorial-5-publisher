@@ -56,7 +56,7 @@ You can install Postman via this website: https://www.postman.com/downloads/
     -   [x] Commit: `Implement add function in Subscriber repository.`
     -   [x] Commit: `Implement list_all function in Subscriber repository.`
     -   [x] Commit: `Implement delete function in Subscriber repository.`
-    -   [ ] Write answers of your learning module's "Reflection Publisher-1" questions in this README.
+    -   [x] Write answers of your learning module's "Reflection Publisher-1" questions in this README.
 -   **STAGE 2: Implement services and controllers**
     -   [ ] Commit: `Create Notification service struct skeleton.`
     -   [ ] Commit: `Implement subscribe function in Notification service.`
@@ -78,6 +78,23 @@ This is the place for you to write reflections:
 
 #### Reflection Publisher-1
 
+1. **In the Observer pattern diagram explained by the Head First Design Pattern book, Subscriber is defined as an interface. Explain based on your understanding of Observer design patterns, do we still need an interface (or trait in Rust) in this BambangShop case, or a single Model struct is enough?**
+
+    > Menurut pemahaman saya, dalam kasus **BambangShop** saat ini, penggunaan **Model struct** saja sudah cukup. Hal ini dikarenakan semua subscriber memiliki perilaku dan struktur data yang seragam, yaitu hanya perlu menyimpan `url` dan `name` serta melakukan aksi yang sama (menerima notifikasi via HTTP POST). 
+    > 
+    > Namun, jika ke depannya sistem ini berkembang dan memiliki berbagai jenis subscriber dengan metode pengiriman yang berbeda (misalnya: SMS, Email, atau Push Notification), maka penggunaan **trait** di Rust akan menjadi sangat penting. Trait akan memungkinkan kita mendefinisikan metode `update()` secara polimorfik, sehingga *Subject* (Publisher) tidak perlu mengetahui detail teknis pengiriman pesan dari masing-masing jenis subscriber.
+
+2. **id in Program and url in Subscriber is intended to be unique. Explain based on your understanding, is using Vec (list) sufficient or using DashMap (map/dictionary) like we currently use is necessary for this case?**
+
+    > Penggunaan **DashMap** jauh lebih tepat dan efisien dibandingkan `Vec` untuk kasus ini karena dua alasan utama:
+    > * **Keunikan (Uniqueness):** Map secara otomatis menjamin keunikan kunci (key). Jika menggunakan `Vec`, kita harus melakukan pengecekan manual setiap kali ingin menambah data untuk memastikan tidak ada `url` yang ganda, yang mana proses ini rentan terhadap kesalahan (*human error*).
+    > * **Efisiensi Performa:** Dengan menjadikan `url` sebagai kunci di DashMap, proses pencarian atau penghapusan data memiliki kompleksitas waktu rata-rata $O(1)$. Jika menggunakan `Vec`, kita harus melakukan iterasi ke seluruh elemen (Linear Search) dengan kompleksitas $O(n)$, yang akan memperlambat performa aplikasi seiring bertambahnya jumlah subscriber.
+
+3. **When programming using Rust, we are enforced by rigorous compiler constraints to make a thread-safe program. In the case of the List of Subscribers (SUBSCRIBERS) static variable, we used the DashMap external library for thread safe HashMap. Explain based on your understanding of design patterns, do we still need DashMap or we can implement Singleton pattern instead?**
+
+    > Kita tetap membutuhkan **DashMap** (atau mekanisme penguncian seperti `Mutex<HashMap>`) meskipun kita sudah menerapkan konsep **Singleton** melalui `lazy_static`. 
+    > 
+    > Perlu dipahami bahwa **Singleton** hanyalah pola desain untuk memastikan hanya ada satu instansi objek di memori, namun pola tersebut tidak secara otomatis menjamin keamanan data saat diakses oleh banyak *thread* secara bersamaan (*thread-safety*). Karena framework Rocket bekerja secara *multithreaded*, beberapa *request* bisa mencoba mengakses atau menulis ke database di waktu yang sama. Tanpa `DashMap` yang menyediakan fitur *concurrent access*, akan terjadi *data race*. `DashMap` memberikan penguncian di tingkat entri (*fine-grained locking*) yang memungkinkan akses aman dan cepat tanpa kita harus mengelola penguncian secara manual.
 #### Reflection Publisher-2
 
 #### Reflection Publisher-3
