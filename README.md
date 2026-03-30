@@ -63,7 +63,7 @@ You can install Postman via this website: https://www.postman.com/downloads/
     -   [x] Commit: `Implement subscribe function in Notification controller.`
     -   [x] Commit: `Implement unsubscribe function in Notification service.`
     -   [x] Commit: `Implement unsubscribe function in Notification controller.`
-    -   [ ] Write answers of your learning module's "Reflection Publisher-2" questions in this README.
+    -   [x] Write answers of your learning module's "Reflection Publisher-2" questions in this README.
 -   **STAGE 3: Implement notification mechanism**
     -   [ ] Commit: `Implement update method in Subscriber model to send notification HTTP requests.`
     -   [ ] Commit: `Implement notify function in Notification service to notify each Subscriber.`
@@ -95,6 +95,30 @@ This is the place for you to write reflections:
     > Kita tetap membutuhkan **DashMap** (atau mekanisme penguncian seperti `Mutex<HashMap>`) meskipun kita sudah menerapkan konsep **Singleton** melalui `lazy_static`. 
     > 
     > Perlu dipahami bahwa **Singleton** hanyalah pola desain untuk memastikan hanya ada satu instansi objek di memori, namun pola tersebut tidak secara otomatis menjamin keamanan data saat diakses oleh banyak *thread* secara bersamaan (*thread-safety*). Karena framework Rocket bekerja secara *multithreaded*, beberapa *request* bisa mencoba mengakses atau menulis ke database di waktu yang sama. Tanpa `DashMap` yang menyediakan fitur *concurrent access*, akan terjadi *data race*. `DashMap` memberikan penguncian di tingkat entri (*fine-grained locking*) yang memungkinkan akses aman dan cepat tanpa kita harus mengelola penguncian secara manual.
+    
 #### Reflection Publisher-2
+
+1. **In the Model-View Controller (MVC) compound pattern, there is no "Service" and "Repository". Model in MVC covers both data storage and business logic. Explain based on your understanding of design principles, why we need to separate "Service" and "Repository" from a Model?**
+
+    > Pemisahan ini dilakukan untuk menerapkan **Single Responsibility Principle (SRP)**. Dalam MVC klasik, "Model" sering kali menjadi terlalu gemuk (*Fat Model*) karena harus menangani struktur data, validasi, logika bisnis, sekaligus akses ke database. 
+    > * **Repository** dipisahkan agar fokus hanya pada detail teknis penyimpanan data (seperti query ke database atau manipulasi `DashMap`). 
+    > * **Service** dipisahkan agar fokus pada alur logika bisnis (misalnya: mengubah input menjadi uppercase sebelum disimpan). 
+    > 
+    > Dengan pemisahan ini, kode menjadi lebih mudah diuji (*testable*), lebih rapi, dan jika suatu saat kita ingin mengganti `DashMap` menjadi PostgreSQL, kita cukup mengubah bagian Repository tanpa merusak logika bisnis di Service.
+
+2. **What happens if we only use the Model? Explain your imagination on how the interactions between each model (Program, Subscriber, Notification) affect the code complexity for each model?**
+
+    > Jika kita hanya menggunakan Model, maka setiap struct (seperti `Subscriber` atau `Notification`) akan memiliki metode yang sangat kompleks. Bayangkan jika `Subscriber` harus tahu cara menyimpan dirinya sendiri ke memori, cara memvalidasi URL-nya sendiri, dan cara mengirim notifikasi. 
+    > 
+    > Hal ini akan menyebabkan **High Coupling** (keterikatan tinggi). Misalnya, jika `Program` ingin mengirim `Notification`, dia harus mengakses internal database yang ada di dalam model `Subscriber`. Jika struktur database berubah, semua model lainnya harus ikut diubah. Kode akan menjadi sulit dikelola karena logika bisnis tersebar di mana-mana dan sulit untuk melacak di mana sebuah data sebenarnya diproses.
+
+3. **Have you explored more about Postman? Tell us how this tool helps you to test your work. You might want to also list which features in Postman you are interested in or feel like it is helpful to help your Group Project or any of your future software engineering projects.**
+
+    > Postman sangat membantu dalam proses pengembangan API karena memungkinkan kita untuk melakukan simulasi *request* (GET, POST, DELETE) tanpa harus membuat tampilan *frontend* terlebih dahulu.
+    > 
+    > Beberapa fitur yang sangat berguna untuk proyek kelompok atau masa depan adalah:
+    > * **Collections & Environments:** Kita bisa menyimpan grup API dan mengganti variabel (seperti URL `localhost` ke `production`) dengan cepat.
+    > * **Automated Testing:** Kita bisa menulis *script* tes sederhana untuk memastikan *response* API selalu mengembalikan status 200 OK atau data yang sesuai.
+    > * **Documentation:** Postman bisa menggenerasi dokumentasi API secara otomatis sehingga anggota tim lain (seperti bagian Frontend) tahu cara menggunakan API yang kita buat tanpa harus membaca seluruh kode Rust kita.
 
 #### Reflection Publisher-3
