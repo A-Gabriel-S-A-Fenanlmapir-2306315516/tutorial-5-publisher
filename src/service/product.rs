@@ -1,6 +1,6 @@
 use rocket::http::Status;
 use rocket::serde::json::Json;
-
+use crate::service::notification::NotificationService;
 use bambangshop::{Result, compose_error_response};
 use crate::model::product::Product;
 use crate::repository::product::ProductRepository;
@@ -12,9 +12,9 @@ impl ProductService {
         product.product_type = product.product_type.to_uppercase();
         let product_result: Product = ProductRepository::add(product);
 
+        NotificationService.notify(&product_result.product_type, "CREATED", product_result.clone());
         return Ok(product_result);
     }
-
     pub fn list() -> Result<Vec<Product>> {
         return Ok(ProductRepository::list_all());
     }
@@ -30,7 +30,7 @@ impl ProductService {
         return Ok(product_opt.unwrap());
     }
 
-    pub fn delete(id: usize) -> Result<Json<Product>> {
+    pub fn delete(id: usize) -> Result<Product> {
         let product_opt: Option<Product> = ProductRepository::delete(id);
         if product_opt.is_none() {
             return Err(compose_error_response(
@@ -40,7 +40,8 @@ impl ProductService {
         }
         let product: Product = product_opt.unwrap();
 
-        return Ok(Json::from(product));
+        NotificationService.notify(&product.product_type, "DELETED", product.clone());
+        return Ok(product);
     }
     pub fn publish(id: usize) -> Result<Product> {
     let product_opt: Option<Product> = ProductRepository::get_by_id(id);
