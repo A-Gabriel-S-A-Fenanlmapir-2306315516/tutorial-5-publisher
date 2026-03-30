@@ -65,7 +65,7 @@ You can install Postman via this website: https://www.postman.com/downloads/
     -   [x] Commit: `Implement unsubscribe function in Notification controller.`
     -   [x] Write answers of your learning module's "Reflection Publisher-2" questions in this README.
 -   **STAGE 3: Implement notification mechanism**
-    -   [ ] Commit: `Implement update method in Subscriber model to send notification HTTP requests.`
+    -   [x] Commit: `Implement update method in Subscriber model to send notification HTTP requests.`
     -   [ ] Commit: `Implement notify function in Notification service to notify each Subscriber.`
     -   [ ] Commit: `Implement publish function in Program service and Program controller.`
     -   [ ] Commit: `Edit Product service methods to call notify after create/delete.`
@@ -95,7 +95,7 @@ This is the place for you to write reflections:
     > Kita tetap membutuhkan **DashMap** (atau mekanisme penguncian seperti `Mutex<HashMap>`) meskipun kita sudah menerapkan konsep **Singleton** melalui `lazy_static`. 
     > 
     > Perlu dipahami bahwa **Singleton** hanyalah pola desain untuk memastikan hanya ada satu instansi objek di memori, namun pola tersebut tidak secara otomatis menjamin keamanan data saat diakses oleh banyak *thread* secara bersamaan (*thread-safety*). Karena framework Rocket bekerja secara *multithreaded*, beberapa *request* bisa mencoba mengakses atau menulis ke database di waktu yang sama. Tanpa `DashMap` yang menyediakan fitur *concurrent access*, akan terjadi *data race*. `DashMap` memberikan penguncian di tingkat entri (*fine-grained locking*) yang memungkinkan akses aman dan cepat tanpa kita harus mengelola penguncian secara manual.
-    
+
 #### Reflection Publisher-2
 
 1. **In the Model-View Controller (MVC) compound pattern, there is no "Service" and "Repository". Model in MVC covers both data storage and business logic. Explain based on your understanding of design principles, why we need to separate "Service" and "Repository" from a Model?**
